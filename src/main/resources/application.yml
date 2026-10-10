@@ -1,0 +1,75 @@
+spring:
+  application:
+    name: spring-ai-rag-chatbot
+
+  # Spring AI Configuration
+  ai:
+    # Anthropic Claude Configuration
+#    anthropic:
+#      api-key: ${ANTHROPIC_API_KEY}
+#      chat:
+#        options:
+#          model: claude-sonnet-4-20250514  #claude-opus-4-6 , claude-opus-4-6
+#          temperature: 0.7
+#          top-p: 0.95
+#          top-k: 40
+#          max-tokens: 2048
+
+    # Ollama Embeddings Configuration (local)
+
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: llama3.2
+      embedding:
+        model: nomic-embed-text
+
+
+    # Vector Store Configuration (PostgreSQL pgvector extension)
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        dimensions: 384
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+
+  # PostgreSQL Configuration (chat history + pgvector embeddings)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/spring_ai_db
+    username: sde
+    password: ******
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
+  # Jackson Configuration
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+      fail-on-empty-beans: false
+
+logging:
+  level:
+    root: INFO
+    org.springframework.ai: DEBUG
+    com.example.springai: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+
+# Application Properties
+app:
+  chat:
+    max-history: 20
+    memory-type: postgres  # redis, memory, postgres
+  rag:
+    chunk-size: 1000
+    overlap: 200
+    similarity-threshold: 0.7
